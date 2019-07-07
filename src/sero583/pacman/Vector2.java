@@ -45,6 +45,11 @@ public class Vector2 {
 		return this.x != -1 && this.y != -1;
 	}
 	
+	public void setVector2(Vector2 vector) {
+		this.x = vector.getX();
+		this.y = vector.getY();
+	}
+	
 	@Override
 	public boolean equals(Object anotherOne) {
 		if(anotherOne instanceof Vector2) {

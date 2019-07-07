@@ -1,6 +1,8 @@
 package sero583.pacman;
 
 import java.awt.Color;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
@@ -25,6 +27,7 @@ public class Level {
 	private Player player;
 	private Set<Bot> bots;
 	private Map<Vector2, LevelObject> objects; //no bots inside
+	private Map<Vector2, Path> paths;
 	
 	private Timer timer;
 	private TickTask task;
@@ -77,40 +80,29 @@ public class Level {
 	}
 	
 	public void tick() {
-		/*for(LevelObject object : this.objects.values()) {
-			//bot.processMovement(this);
-			/* else if(object instanceof Path) {
-				Path p = (Path) object;
-			} TODO: Clarify if this is needed
-	}*/
-		
 		double velX = this.player.getVelX();
 		double velY = this.player.getVelY();
 		
 		Object collisionPartner = null;
+		Vector2 newPos = null;
+		
+		//TODO: test if first Left-right and then up-down checks should be made
 		if(velX>0) {
-			this.player.setVelX(--velX);
-			//go right
-			collisionPartner = this.getThingAt(this.player.add(DEFAULT_VELOCITY));
+			newPos = this.player.add(DEFAULT_VELOCITY);
 		} else if(velX<0) {
-			this.player.setVelX(++velX);
-			//go left
-			collisionPartner = this.getThingAt(this.player.substract(DEFAULT_VELOCITY));
+			newPos = this.player.substract(DEFAULT_VELOCITY);
 		}
 		
 		if(velY>0) {
-			this.player.setVelY(--velY);
-			//go up
-			collisionPartner = this.getThingAt(this.player.add(0, DEFAULT_VELOCITY));
+			newPos = this.player.add(0, DEFAULT_VELOCITY);
 		} else if(velY<0) {
-			this.player.setVelY(++velY);
-			//go down
-			collisionPartner = this.getThingAt(this.player.substract(0, DEFAULT_VELOCITY));
+			newPos = this.player.substract(0, DEFAULT_VELOCITY);
 		}
+		collisionPartner = this.getThingAt(newPos);
 		
 		if(collisionPartner!=null) {
 			if(collisionPartner instanceof Bot) {
-				//dead
+				this.endGame();
 			} else if(collisionPartner instanceof Wall) {
 				//no move
 			} else if(collisionPartner instanceof Path) {
@@ -120,6 +112,7 @@ public class Level {
 					this.getMainInstance().addScore(COIN_SCORE);
 					path.setCoin(false);
 				}
+				this.player.setVector2(newPos);
 			}
 		} else {
 			this.getMainInstance().launcher.getLogger().error("Player moved to invalid area!");
@@ -130,8 +123,14 @@ public class Level {
 		}
 	}
 	
+	public void endGame() {
+		//TODO: unschedule etc.
+		this.getMainInstance().launcher.getLogger().info("Here we have to stop. Score made = " + this.getMainInstance().getScore());
+	}
+	
 	public void setLevelObjects(Map<Vector2, LevelObject> objects) {
 		this.objects = objects;
+		this.paths = this.getPaths();
 	}
 	
 	public void setDefaultLevelObjects() {
@@ -144,9 +143,22 @@ public class Level {
 			}
 		}
 		
+		//TODO: enhance path generation paths
+		Path path = new Path(Color.RED, -1, -1);
+		for(int x = 1; x < this.getWidth()-1; x++) {
+			for(int y = 1; y < this.getHeight()-1; y++) {
+				path.setX(x);
+				path.setY(y);
+				
+				this.putLevelObject(path, true);
+			}
+		}
+		
 		this.player = this.createPlayer("PacMan");
 		this.player.setX(32);
 		this.player.setY(32);
+		
+		this.paths = this.getPaths();
 		
 		this.getMainInstance().launcher.startRenderer();
 	}
@@ -225,6 +237,18 @@ public class Level {
 			}
 		}
 		return null;
+	}
+	
+	//Shouldnt be used, only for caching since path will only change at new generation
+	public Map<Vector2, Path> getPaths() {
+		Map<Vector2, Path> map = new HashMap<Vector2, Path>();
+		
+		for(LevelObject obj : this.objects.values()) {
+			if(obj instanceof Path) {
+				map.put(obj.toVector2(), (Path) obj);
+			}
+		}
+		return map;
 	}
 	
 	public Object getThingAt(Vector2 vector) {

@@ -61,8 +61,11 @@ public abstract class Entity extends Vector2 {
 		return false;
 	}
 
-
 	public boolean harmfulCollision() {
 		return false;
+	}
+	
+	public Vector2 toVector2() {
+		return new Vector2(this.getX(), this.getY());
 	}
 }
