@@ -42,4 +42,9 @@ public class ScreenInfo {
 		}
 		return false;
 	}
+	
+	@Override
+	public String toString() {
+		return "ScreenInfo(width=" + this.width + ", height=" + this.height + ")";
+	}
 }

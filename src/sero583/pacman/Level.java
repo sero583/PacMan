@@ -13,9 +13,9 @@ import sero583.pacman.launcher.ScreenInfo;
 public class Level {
 	public static final long TPS = 20;
 	public static final double DEFAULT_VELOCITY = 0.5;
-	public static final int DEFAULT_X = 64;
-	public static final int DEFAULT_Y = 64;
-	public static final Color DEFAULT_COLOR = Color.RED;
+	public static final int DEFAULT_X = 15;
+	public static final int DEFAULT_Y = 15;
+	public static final Color DEFAULT_PLAYER_COLOR = Color.RED;
 	public static final int DEFAULT_BOT_COUNT = 4;
 	
 	public static final int COIN_SCORE = 20;
@@ -68,7 +68,7 @@ public class Level {
 	}
 	
 	public Player createPlayer(String name) {
-		return this.createPlayer(name, DEFAULT_COLOR);
+		return this.createPlayer(name, DEFAULT_PLAYER_COLOR);
 	}
 	
 	public Player createPlayer(String name, Color color) {
@@ -137,9 +137,9 @@ public class Level {
 				}
 				this.player.setVector2(newPos);
 			}
-		} else {
+		}/* else {
 			this.getMainInstance().launcher.getLogger().error("Player moved to invalid area!");
-		}
+		}*/
 		
 		for(Bot bot : this.bots) {
 			//do AI stuff here
@@ -160,6 +160,7 @@ public class Level {
 		Wall wall = new Wall(Color.BLUE, -1, -1);
 		for(int x = 0; x < this.getWidth(); x++) {
 			for(int y = 0; y < this.getHeight(); y++) {
+				//this.getMainInstance().launcher.getLogger().info("XandY: " + x + ":" + y);
 				wall.setX(x);
 				wall.setY(y);
 				this.putLevelObject(wall, true);
@@ -172,14 +173,15 @@ public class Level {
 			for(int y = 1; y < this.getHeight()-1; y++) {
 				path.setX(x);
 				path.setY(y);
+				//this.getMainInstance().launcher.getLogger().info("XandY: " + x + ":" + y);
 				
 				this.putLevelObject(path, true);
 			}
 		}
 		
 		this.player = this.createPlayer("PacMan");
-		this.player.setX(32);
-		this.player.setY(32);
+		this.player.setX(8);
+		this.player.setY(8);
 		
 		this.paths = this.getPaths();
 		this.generateBots(5);
@@ -187,26 +189,36 @@ public class Level {
 		this.getMainInstance().launcher.startThread();
 	}
 	
-	public boolean putLevelObject(LevelObject object) {
-		return this.putLevelObject(object, true);
-	}
 	
 	public void grahicsRender(Graphics g) {
 		ScreenInfo screen = this.getMainInstance().launcher.getScreenInfo();
+		this.getMainInstance().launcher.getLogger().info(screen.toString());
+		
+		
 		double chunkSizeX = screen.divideWidth(this.getWidth());
 		double chunkSizeY = screen.divideWidth(this.getHeight());
+		this.getMainInstance().launcher.getLogger().info("Width:" + chunkSizeX + ", Height: " + chunkSizeY);
 		
+		/*int i = 0;
 		for(LevelObject object : this.objects.values()) {
 			double startX = chunkSizeX * object.getX();
 			double startY = chunkSizeY * object.getY();
+			
 			double endX = chunkSizeX * (object.getX()+1);
 			double endY = chunkSizeY * (object.getY()+1);
 			
+			String data = "RESULT Index: " + i + ": StartX: " + startX + ", StartY: " + startY + ", EndX: " + endX + ", EndY: " + endY;
+			if(i<100) this.getMainInstance().launcher.getLogger().info(data);
+			String his = "HISTORY Index: " + i + ": ObjectX: " + object.getX() + ", ObjectY: " + object.getY() + ", ChunkX: " + chunkSizeX + ", ChunkY: " + chunkSizeY;
+			if(i<100) this.getMainInstance().launcher.getLogger().info(his);
+			
 			if(object.hasColor()==true) {
 				g.setColor(object.getColor());
-				g.drawRect((int) startX, (int) startY, (int) endX, (int) endY);
+				g.fillRect((int) startX, (int) startY, (int) endX, (int) endY);
 			}
+			i++;
 		}
+		this.getMainInstance().launcher.getLogger().info("Level object count:" + objects.values().size());
 		
 		for(Bot bot : this.bots) {
 			double startX = chunkSizeX * bot.getX();
@@ -214,16 +226,33 @@ public class Level {
 			double endX = chunkSizeX * (bot.getX()+1);
 			double endY = chunkSizeY * (bot.getY()+1);
 			g.setColor(bot.getColor());
-			g.drawRect((int) startX, (int) startY, (int) endX, (int) endY);
-		}
+			g.fillRect((int) startX, (int) startY, (int) endX, (int) endY);
+		}*/
 		
 		//player here
 		double startX = chunkSizeX * this.player.getX();
 		double startY = chunkSizeY * this.player.getY();
 		double endX = chunkSizeX * (this.player.getX()+1);
 		double endY = chunkSizeY * (this.player.getY()+1);
+		
+		
+		
 		g.setColor(this.player.getColor());
-		g.drawRect((int) startX, (int) startY, (int) endX, (int) endY);
+		g.fillRect((int) startX, (int) startY, (int) endX, (int) endY);
+		String data = "Player:" + "StartX: " + this.player.getX() + "*" + chunkSizeX + ", StartY: " + this.player.getY() + "*" + chunkSizeY +
+					   ", EndX: " + endX + "*" + chunkSizeX + ", EndY: " + (this.player.getX()+1) + "*" + (this.player.getY()+1);
+		this.getMainInstance().launcher.getLogger().info(data);
+		
+		try {
+			Thread.currentThread().sleep(5000L);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public boolean putLevelObject(LevelObject object) {
+		return this.putLevelObject(object, true);
 	}
 	
 	//Returns false if invalid vector2 or wont override
@@ -233,11 +262,17 @@ public class Level {
 			return false;
 		}
 		
-		if(this.objects.containsKey(object.toVector2())==true&&override==false) {
-			//this.getMainInstance().launcher.getLogger().error("Tried to register LevelObject (" + object.getClass().getSimpleName() + "), one already existent and overriding was set to false.");
-			return false;
+		for(Map.Entry<Vector2, LevelObject> entry : this.objects.entrySet()) {
+			Vector2 pos = entry.getKey();
+			LevelObject obj = entry.getValue();
+			
+			if(pos.equals(object.toVector2())==true) {
+				if(override==true) {
+					this.objects.remove(pos); //idk if necessary but putted it in there anyway
+					break;
+				} else return false;
+			}
 		}
-		
 		this.objects.put(object.toVector2(), object);
 		return true;
 	}
