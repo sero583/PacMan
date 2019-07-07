@@ -25,11 +25,11 @@ public class ScreenInfo {
 		return this.height;
 	}
 	
-	public double divideHeight(double divider) {
-		return this.height / divider;
+	public double divideWidth(double divider) {
+		return this.width / divider;
 	}
 	
-	public double divideWidth(double divider) {
+	public double divideHeight(double divider) {
 		return this.height / divider;
 	}
 	

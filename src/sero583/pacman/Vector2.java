@@ -58,4 +58,9 @@ public class Vector2 {
 		}
 		return false;
 	}
+	
+	@Override
+	public String toString() {
+		return "Vector2(x=" + this.x + ", y=" + this.y + ")";
+	}
 }

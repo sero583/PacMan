@@ -184,7 +184,7 @@ public class Level {
 		this.player.setY(8);
 		
 		this.paths = this.getPaths();
-		this.generateBots(5);
+		this.generateBots();
 		
 		this.getMainInstance().launcher.startThread();
 	}
@@ -196,7 +196,7 @@ public class Level {
 		
 		
 		double chunkSizeX = screen.divideWidth(this.getWidth());
-		double chunkSizeY = screen.divideWidth(this.getHeight());
+		double chunkSizeY = screen.divideHeight(this.getHeight());
 		this.getMainInstance().launcher.getLogger().info("Width:" + chunkSizeX + ", Height: " + chunkSizeY);
 		
 		/*int i = 0;
@@ -239,6 +239,7 @@ public class Level {
 		
 		g.setColor(this.player.getColor());
 		g.fillRect((int) startX, (int) startY, (int) endX, (int) endY);
+		
 		String data = "Player:" + "StartX: " + this.player.getX() + "*" + chunkSizeX + ", StartY: " + this.player.getY() + "*" + chunkSizeY +
 					   ", EndX: " + endX + "*" + chunkSizeX + ", EndY: " + (this.player.getX()+1) + "*" + (this.player.getY()+1);
 		this.getMainInstance().launcher.getLogger().info(data);
