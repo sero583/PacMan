@@ -8,7 +8,7 @@ public abstract class Entity extends Vector2 {
 	private Color color;
 	private double velX, velY = 0;
 	
-	public Entity(int id, Color color, int x, int y) {
+	public Entity(int id, Color color, double x, double y) {
 		super(x, y);
 		this.id = id;
 		this.color = color;

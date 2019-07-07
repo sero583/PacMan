@@ -30,4 +30,10 @@ public class Wall extends Vector2 implements LevelObject {
 	public boolean harmfulCollision() {
 		return false;
 	}
+
+
+	@Override
+	public boolean hasColor() {
+		return true;
+	}
 }

@@ -12,7 +12,7 @@ public class Player extends Entity {
 		this.name = name;
 	}
 	
-	public Player(String name, int id, Color color, int x, int z) {
+	public Player(String name, int id, Color color, double x, double z) {
 		super(id, color, x, z);
 		
 		this.name = name;

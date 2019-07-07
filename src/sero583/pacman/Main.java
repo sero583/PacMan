@@ -13,6 +13,8 @@ public class Main {
 		Main.instance = this;
 		this.launcher = launcher;
 		this.level = new Level(this);
+		this.level.setDefaultLevelObjects();
+		this.level.startTickTask();
 		launcher.getLogger().info("Started PacMan!");
 	}
 	

@@ -1,13 +1,17 @@
 package sero583.pacman;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 
+import sero583.pacman.launcher.ScreenInfo;
+
 public class Level {
+	public static final long TPS = 20;
 	public static final double DEFAULT_VELOCITY = 0.5;
 	public static final int DEFAULT_X = 64;
 	public static final int DEFAULT_Y = 64;
@@ -48,9 +52,15 @@ public class Level {
 		this.width = width;
 		this.height = height;
 		
+		this.objects = new HashMap<Vector2, LevelObject>();
+		this.bots = new HashSet<Bot>();
+		
 		this.timer = new Timer();
+	}
+	
+	public void startTickTask() {
 		this.task = new TickTask(this);
-		this.timer.scheduleAtFixedRate(this.task, 0L, 20L);
+		this.timer.scheduleAtFixedRate(this.task, 0L, TPS);
 	}
 	
 	public Main getMainInstance() {
@@ -75,8 +85,21 @@ public class Level {
 	
 	public void generateBots(int count) {
 		for(int i = 0; i < count; i++) {
+			Vector2 gen = this.generatePosInRange();
 			
+			while(this.getEntityAt(gen)!=null) {
+				//keep generating..
+				gen = this.generatePosInRange();
+			}
+			Bot bot = new Bot(ENTITY_COUNT++, Color.GRAY, gen.getX(), gen.getY());
+			this.bots.add(bot);
 		}
+	}
+	
+	public Vector2 generatePosInRange() {
+		int x = Utils.generateNumber(1, this.getWidth()-1);
+		int y = Utils.generateNumber(1, this.getHeight()-1);
+		return new Vector2(x, y);
 	}
 	
 	public void tick() {
@@ -159,17 +182,52 @@ public class Level {
 		this.player.setY(32);
 		
 		this.paths = this.getPaths();
+		this.generateBots(5);
 		
-		this.getMainInstance().launcher.startRenderer();
+		this.getMainInstance().launcher.startThread();
 	}
 	
 	public boolean putLevelObject(LevelObject object) {
 		return this.putLevelObject(object, true);
 	}
 	
+	public void grahicsRender(Graphics g) {
+		ScreenInfo screen = this.getMainInstance().launcher.getScreenInfo();
+		double chunkSizeX = screen.divideWidth(this.getWidth());
+		double chunkSizeY = screen.divideWidth(this.getHeight());
+		
+		for(LevelObject object : this.objects.values()) {
+			double startX = chunkSizeX * object.getX();
+			double startY = chunkSizeY * object.getY();
+			double endX = chunkSizeX * (object.getX()+1);
+			double endY = chunkSizeY * (object.getY()+1);
+			
+			if(object.hasColor()==true) {
+				g.setColor(object.getColor());
+				g.drawRect((int) startX, (int) startY, (int) endX, (int) endY);
+			}
+		}
+		
+		for(Bot bot : this.bots) {
+			double startX = chunkSizeX * bot.getX();
+			double startY = chunkSizeY * bot.getY();
+			double endX = chunkSizeX * (bot.getX()+1);
+			double endY = chunkSizeY * (bot.getY()+1);
+			g.setColor(bot.getColor());
+			g.drawRect((int) startX, (int) startY, (int) endX, (int) endY);
+		}
+		
+		//player here
+		double startX = chunkSizeX * this.player.getX();
+		double startY = chunkSizeY * this.player.getY();
+		double endX = chunkSizeX * (this.player.getX()+1);
+		double endY = chunkSizeY * (this.player.getY()+1);
+		g.setColor(this.player.getColor());
+		g.drawRect((int) startX, (int) startY, (int) endX, (int) endY);
+	}
+	
 	//Returns false if invalid vector2 or wont override
 	public boolean putLevelObject(LevelObject object, boolean override) {
-		
 		if(object.isValidVector()==false) {
 			this.getMainInstance().launcher.getLogger().error("Tried to register LevelObject (" + object.getClass().getSimpleName() + ") with invalid Vector2!");
 			return false;

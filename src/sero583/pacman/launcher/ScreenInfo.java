@@ -24,4 +24,22 @@ public class ScreenInfo {
 	public double getHeight() {
 		return this.height;
 	}
+	
+	public double divideHeight(double divider) {
+		return this.height / divider;
+	}
+	
+	public double divideWidth(double divider) {
+		return this.height / divider;
+	}
+	
+	@Override
+	public boolean equals(Object anotherObject) {
+		if(anotherObject instanceof ScreenInfo) {
+			ScreenInfo second = (ScreenInfo) anotherObject;
+			
+			return this.width == second.getWidth() && this.height == this.getHeight();
+		}
+		return false;
+	}
 }
