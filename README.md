@@ -5,7 +5,7 @@ This project is a leisure time project from an usual student. I try to enhance m
 # Why does this differs from the real concept of PacMan?
 This is because, it's a project which I want to keep very basic. There may come changes soon, to aim more at the real concept.
 # Can I play it?
-No, you can't <b>yet<b>. This project is still highly WIP.
+No, you can't <b>yet</b>. This project is still highly WIP.
 # Will this support more Operating Systems or only Windows?
 At the moment, every development process is focused on Windows OS. This does not comes to the conclusion that others won't be supported. They won't be for now. There may something will come very soon.
 # Got an issue with Right and Law?
