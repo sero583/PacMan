@@ -25,6 +25,22 @@ public class Vector2 {
 		this.y = y;
 	}
 	
+	public Vector2 add(int x) {
+		return this.add(x, 0);
+	}
+	
+	public Vector2 add(int x, int y) {
+		return new Vector2(this.x + x, this.y + y);
+	}
+	
+	public Vector2 substract(int x) {
+		return this.substract(x, 0);
+	}
+	
+	public Vector2 substract(int x, int y) {
+		return new Vector2(this.x - x, this.y - y);
+	}
+	
 	public boolean isValidVector() {
 		return this.x != -1 && this.y != -1;
 	}

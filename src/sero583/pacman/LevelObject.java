@@ -8,4 +8,8 @@ public interface LevelObject {
 	public default Vector2 toVector2() {
 		return new Vector2(this.getX(), this.getY());
 	}
+	
+	public default void onCollide(LevelObject hitObject) {
+		
+	}
 }

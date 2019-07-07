@@ -1,6 +1,7 @@
 package sero583.pacman;
 
 import java.awt.Color;
+import java.awt.event.KeyEvent;
 
 public class Player extends Entity {
 	private String name;

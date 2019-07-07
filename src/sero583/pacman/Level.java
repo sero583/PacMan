@@ -3,8 +3,10 @@ package sero583.pacman;
 import java.awt.Color;
 import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
 
 public class Level {
+	public static final int DEFAULT_VELOCITY = 1;
 	public static final int DEFAULT_X = 64;
 	public static final int DEFAULT_Y = 64;
 	public static final Color DEFAULT_COLOR = Color.RED;
@@ -20,6 +22,9 @@ public class Level {
 	private Set<Bot> bots;
 	private Map<Vector2, LevelObject> objects;
 	
+	private Timer timer;
+	private TickTask task;
+	
 	public Level() {
 		this("default", DEFAULT_X, DEFAULT_Y);
 	}
@@ -33,6 +38,10 @@ public class Level {
 		
 		this.width = width;
 		this.height = height;
+		
+		this.timer = new Timer();
+		this.task = new TickTask(this);
+		this.timer.scheduleAtFixedRate(this.task, 0L, 20L);
 	}
 	
 	public Player createPlayer(String name) {
@@ -57,10 +66,57 @@ public class Level {
 		}
 	}
 	
-	public void tickBots() {
-		for(Bot bot : this.bots) {
+	public void tick() {
+		for(LevelObject object : this.objects.values()) {
 			//bot.processMovement(this);
+			if(object instanceof Player) {
+				Player p = (Player) object;
+				
+				int velX = p.getVelX();
+				int velY = p.getVelY();
+				
+				LevelObject collisionPartner = null;
+				if(velX>0) {
+					p.setVelX(--velX);
+					//go right
+					collisionPartner = this.getLevelObjectAt(p.add(1));
+				} else if(velX<0) {
+					p.setVelX(++velX);
+					//go left
+					collisionPartner = this.getLevelObjectAt(p.substract(1));
+				}
+				
+				if(velY>0) {
+					p.setVelY(--velY);
+					//go up
+					collisionPartner = this.getLevelObjectAt(p.add(0, 1));
+				} else if(velY<0) {
+					p.setVelY(++velY);
+					//go down
+					collisionPartner = this.getLevelObjectAt(p.substract(0, 1));
+				}
+				
+				if(collisionPartner!=null) {
+					if(collisionPartner instanceof Bot) {
+						//dead
+					} else if(collisionPartner instanceof Wall) {
+						//no move
+					} else if(collisionPartner instanceof Path) {
+						//move and check for coins
+					}
+				} else {
+					Main.instance.launcher.getLogger().error("Player moved to invalid area!");
+				}
+			} else if(object instanceof Bot) {
+				Bot b = (Bot) object;
+				
+				//do AI stuff here
+			} else if(object instanceof Path) {
+				Path p = (Path) object;
+			}
 		}
+		
+		
 	}
 	
 	public void setLevelObjects(Map<Vector2, LevelObject> objects) {
@@ -135,5 +191,31 @@ public class Level {
 	
 	public Set<Bot> getBots() {
 		return this.bots;
+	}
+	
+	public Entity getEntity(int id) {
+		if(this.player.getId()==id) {
+			return this.player;
+		} else {
+			for(Bot bot : this.bots) {
+				if(bot.getId()==id) {
+					return bot;
+				}
+			}
+		}
+		return null;
+	}
+	
+	public LevelObject getLevelObjectAt(Vector2 vector) {
+		for(LevelObject object : this.objects.values()) {
+			if(object.equals(vector)==true) {
+				return object;
+			}
+		}
+		return null;
+	}
+	
+	public boolean entityExists(int id) {
+		return this.getEntity(id) != null;
 	}
 }
