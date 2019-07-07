@@ -3,6 +3,7 @@ package sero583.pacman;
 import sero583.pacman.launcher.BaseLauncher;
 
 public class Main {
+	private int score = 0;
 	public static Main instance;
 	private Level level;
 	public BaseLauncher launcher;
@@ -17,6 +18,18 @@ public class Main {
 		this.launcher = launcher;
 		this.level = new Level();
 		launcher.getLogger().info("Started PacMan!");
+	}
+	
+	public void addScore(int score) {
+		this.score += score;
+	}
+	
+	public void setScore(int score) {
+		this.score = score;
+	}
+	
+	public int getScore() {
+		return this.score;
 	}
 	
 	public Level getLevel() {

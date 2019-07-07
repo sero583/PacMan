@@ -12,6 +12,8 @@ public class Level {
 	public static final Color DEFAULT_COLOR = Color.RED;
 	public static final int DEFAULT_BOT_COUNT = 4;
 	
+	public static final int COIN_SCORE = 20;
+	
 	public static int ENTITY_COUNT = 1;
 	
 	private String name;
@@ -103,6 +105,11 @@ public class Level {
 						//no move
 					} else if(collisionPartner instanceof Path) {
 						//move and check for coins
+						Path path = (Path) collisionPartner;
+						if(path.hasCoin()==true) {
+							Main.instance.addScore(COIN_SCORE);
+							path.setCoin(false);
+						}
 					}
 				} else {
 					Main.instance.launcher.getLogger().error("Player moved to invalid area!");
@@ -111,9 +118,9 @@ public class Level {
 				Bot b = (Bot) object;
 				
 				//do AI stuff here
-			} else if(object instanceof Path) {
+			}/* else if(object instanceof Path) {
 				Path p = (Path) object;
-			}
+			} TODO: Clarify if this is needed */
 		}
 		
 		
