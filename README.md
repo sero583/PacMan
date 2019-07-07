@@ -8,5 +8,5 @@ This is because, it's a project which I want to keep very basic. There may come 
 No, you can't <b>yet</b>. This project is still highly WIP.
 # Will this support more Operating Systems or only Windows?
 At the moment, every development process is focused on Windows OS. This does not comes to the conclusion that others won't be supported. They won't be for now. There may something will come very soon.
-# Got an issue with Right and Law?
-If anything is wrong within this project, feel free to contact me for further negotiations.
+# Got an issue related to DMCA?
+If anything is wrong within this project, feel free to contact me for further negotiations. This is considered as a fan project and will not be used for commerical gains.
