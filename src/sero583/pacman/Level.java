@@ -18,6 +18,9 @@ public class Level {
 	public static final Color DEFAULT_PLAYER_COLOR = Color.RED;
 	public static final int DEFAULT_BOT_COUNT = 4;
 	
+	public static final double DEFAULT_PLAYER_X = 1;
+	public static final double DEFAULT_PLAYER_Y = 1;
+	
 	public static final int COIN_SCORE = 20;
 	
 	public static int ENTITY_COUNT = 1;
@@ -180,8 +183,8 @@ public class Level {
 		}
 		
 		this.player = this.createPlayer("PacMan");
-		this.player.setX(8);
-		this.player.setY(8);
+		this.player.setX(DEFAULT_PLAYER_X);
+		this.player.setY(DEFAULT_PLAYER_Y);
 		
 		this.paths = this.getPaths();
 		this.generateBots();
@@ -189,16 +192,19 @@ public class Level {
 		this.getMainInstance().launcher.startThread();
 	}
 	
-	
-	public void grahicsRender(Graphics g) {
+	private double chunkSizeX;
+	private double chunkSizeY;
+
+	public void onSizeUpdate() {
 		ScreenInfo screen = this.getMainInstance().launcher.getScreenInfo();
 		this.getMainInstance().launcher.getLogger().info(screen.toString());
-		
-		
-		double chunkSizeX = screen.divideWidth(this.getWidth());
-		double chunkSizeY = screen.divideHeight(this.getHeight());
+
+		this.chunkSizeX = screen.divideWidth(this.getWidth());
+		this.chunkSizeY = screen.divideHeight(this.getHeight());
+	}
+	
+	public void grahicsRender(Graphics g) {
 		this.getMainInstance().launcher.getLogger().info("Width:" + chunkSizeX + ", Height: " + chunkSizeY);
-		
 		/*int i = 0;
 		for(LevelObject object : this.objects.values()) {
 			double startX = chunkSizeX * object.getX();
@@ -240,16 +246,21 @@ public class Level {
 		g.setColor(this.player.getColor());
 		g.fillRect((int) startX, (int) startY, (int) endX, (int) endY);
 		
-		String data = "Player:" + "StartX: " + this.player.getX() + "*" + chunkSizeX + ", StartY: " + this.player.getY() + "*" + chunkSizeY +
+		String calc = "Calculation:" + "StartX: " + this.player.getX() + "*" + chunkSizeX + ", StartY: " + this.player.getY() + "*" + chunkSizeY +
 					   ", EndX: " + endX + "*" + chunkSizeX + ", EndY: " + (this.player.getX()+1) + "*" + (this.player.getY()+1);
-		this.getMainInstance().launcher.getLogger().info(data);
+		this.getMainInstance().launcher.getLogger().info(calc);
+		String res = "Result:" + "StartX: " + startX +  ", StartY: " + startY + ", EndX: " + endX + ", EndY: " + endY;
 		
-		try {
+		
+		//g.drawRect(0, 0, 100, 100);
+		
+		
+		/*try {
 			Thread.currentThread().sleep(5000L);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 	}
 
 	public boolean putLevelObject(LevelObject object) {

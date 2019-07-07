@@ -27,7 +27,7 @@ public class WindowsLauncher extends BaseLauncher implements KeyListener {
 
 	public static final int DEFAULT_WIDTH = 720;
 	public static final int DEFAULT_HEIGHT = 500;
-	public static final boolean UPPER_ACTIONBAR_ENABLED = true;
+	public static final boolean UPPER_ACTIONBAR_ENABLED = false;
 	
 	private Main main;
 	private GameFrame frame;
@@ -107,7 +107,7 @@ public class WindowsLauncher extends BaseLauncher implements KeyListener {
 			this.main.getLevel().grahicsRender(g);
 			
 			if(this.showFPS()==true&&this.renderableFrameCount!=null) {
-				g.setColor(Color.RED);
+				g.setColor(Color.CYAN);
 				g.setFont(new Font("Arial Black", Font.BOLD, 16));
 				g.drawString("FPS: " + this.renderableFrameCount, 50, 50);
 			}
@@ -127,6 +127,7 @@ public class WindowsLauncher extends BaseLauncher implements KeyListener {
 	public void onScreenUpdate() {
 		this.getScreenInfo().setWidth(this.frame.getWidth());
 		this.getScreenInfo().setHeight(this.frame.getHeight());
+		this.main.getLevel().onSizeUpdate();
 	}
 
 	@Override
