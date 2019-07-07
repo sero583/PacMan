@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.Timer;
 
 public class Level {
-	public static final int DEFAULT_VELOCITY = 1;
+	public static final double DEFAULT_VELOCITY = 0.5;
 	public static final int DEFAULT_X = 64;
 	public static final int DEFAULT_Y = 64;
 	public static final Color DEFAULT_COLOR = Color.RED;
@@ -16,26 +16,30 @@ public class Level {
 	
 	public static int ENTITY_COUNT = 1;
 	
+	private Main main;
+	
 	private String name;
 	private int width;
 	private int height;
 	
 	private Player player;
 	private Set<Bot> bots;
-	private Map<Vector2, LevelObject> objects;
+	private Map<Vector2, LevelObject> objects; //no bots inside
 	
 	private Timer timer;
 	private TickTask task;
 	
-	public Level() {
-		this("default", DEFAULT_X, DEFAULT_Y);
+	public Level(Main main) {
+		this(main, "default", DEFAULT_X, DEFAULT_Y);
 	}
 	
-	public Level(int width, int height) {
-		this("default", width, height);
+	public Level(Main main, int width, int height) {
+		this(main, "default", width, height);
 	}
 	
-	public Level(String name, int width, int height) {
+	public Level(Main main, String name, int width, int height) {
+		this.main = main;
+		
 		this.name = name;
 		
 		this.width = width;
@@ -44,6 +48,10 @@ public class Level {
 		this.timer = new Timer();
 		this.task = new TickTask(this);
 		this.timer.scheduleAtFixedRate(this.task, 0L, 20L);
+	}
+	
+	public Main getMainInstance() {
+		return this.main;
 	}
 	
 	public Player createPlayer(String name) {
@@ -69,61 +77,57 @@ public class Level {
 	}
 	
 	public void tick() {
-		for(LevelObject object : this.objects.values()) {
+		/*for(LevelObject object : this.objects.values()) {
 			//bot.processMovement(this);
-			if(object instanceof Player) {
-				Player p = (Player) object;
-				
-				int velX = p.getVelX();
-				int velY = p.getVelY();
-				
-				LevelObject collisionPartner = null;
-				if(velX>0) {
-					p.setVelX(--velX);
-					//go right
-					collisionPartner = this.getLevelObjectAt(p.add(1));
-				} else if(velX<0) {
-					p.setVelX(++velX);
-					//go left
-					collisionPartner = this.getLevelObjectAt(p.substract(1));
-				}
-				
-				if(velY>0) {
-					p.setVelY(--velY);
-					//go up
-					collisionPartner = this.getLevelObjectAt(p.add(0, 1));
-				} else if(velY<0) {
-					p.setVelY(++velY);
-					//go down
-					collisionPartner = this.getLevelObjectAt(p.substract(0, 1));
-				}
-				
-				if(collisionPartner!=null) {
-					if(collisionPartner instanceof Bot) {
-						//dead
-					} else if(collisionPartner instanceof Wall) {
-						//no move
-					} else if(collisionPartner instanceof Path) {
-						//move and check for coins
-						Path path = (Path) collisionPartner;
-						if(path.hasCoin()==true) {
-							Main.instance.addScore(COIN_SCORE);
-							path.setCoin(false);
-						}
-					}
-				} else {
-					Main.instance.launcher.getLogger().error("Player moved to invalid area!");
-				}
-			} else if(object instanceof Bot) {
-				Bot b = (Bot) object;
-				
-				//do AI stuff here
-			}/* else if(object instanceof Path) {
+			/* else if(object instanceof Path) {
 				Path p = (Path) object;
-			} TODO: Clarify if this is needed */
+			} TODO: Clarify if this is needed
+	}*/
+		
+		double velX = this.player.getVelX();
+		double velY = this.player.getVelY();
+		
+		Object collisionPartner = null;
+		if(velX>0) {
+			this.player.setVelX(--velX);
+			//go right
+			collisionPartner = this.getThingAt(this.player.add(DEFAULT_VELOCITY));
+		} else if(velX<0) {
+			this.player.setVelX(++velX);
+			//go left
+			collisionPartner = this.getThingAt(this.player.substract(DEFAULT_VELOCITY));
 		}
 		
+		if(velY>0) {
+			this.player.setVelY(--velY);
+			//go up
+			collisionPartner = this.getThingAt(this.player.add(0, DEFAULT_VELOCITY));
+		} else if(velY<0) {
+			this.player.setVelY(++velY);
+			//go down
+			collisionPartner = this.getThingAt(this.player.substract(0, DEFAULT_VELOCITY));
+		}
 		
+		if(collisionPartner!=null) {
+			if(collisionPartner instanceof Bot) {
+				//dead
+			} else if(collisionPartner instanceof Wall) {
+				//no move
+			} else if(collisionPartner instanceof Path) {
+				//move and check for coins
+				Path path = (Path) collisionPartner;
+				if(path.hasCoin()==true) {
+					this.getMainInstance().addScore(COIN_SCORE);
+					path.setCoin(false);
+				}
+			}
+		} else {
+			this.getMainInstance().launcher.getLogger().error("Player moved to invalid area!");
+		}
+		
+		for(Bot bot : this.bots) {
+			//do AI stuff here
+		}
 	}
 	
 	public void setLevelObjects(Map<Vector2, LevelObject> objects) {
@@ -136,47 +140,36 @@ public class Level {
 			for(int y = 0; y < this.getHeight(); y++) {
 				wall.setX(x);
 				wall.setY(y);
-				this.putLevelObject(wall, true, false);
+				this.putLevelObject(wall, true);
 			}
 		}
 		
 		this.player = this.createPlayer("PacMan");
 		this.player.setX(32);
 		this.player.setY(32);
-		this.putLevelObject(this.player, true, false);
-		this.update();
+		
+		this.getMainInstance().launcher.startRenderer();
 	}
 	
 	public boolean putLevelObject(LevelObject object) {
-		return this.putLevelObject(object, true, true);
-	}
-	public boolean putLevelObject(LevelObject object, boolean override) {
-		return this.putLevelObject(object, override, true);
+		return this.putLevelObject(object, true);
 	}
 	
 	//Returns false if invalid vector2 or wont override
-	public boolean putLevelObject(LevelObject object, boolean override, boolean callUpdate) {
+	public boolean putLevelObject(LevelObject object, boolean override) {
+		
 		if(object.isValidVector()==false) {
-			Main.instance.launcher.getLogger().error("Tried to register LevelObject (" + object.getClass().getSimpleName() + ") with invalid Vector2!");
+			this.getMainInstance().launcher.getLogger().error("Tried to register LevelObject (" + object.getClass().getSimpleName() + ") with invalid Vector2!");
 			return false;
 		}
 		
 		if(this.objects.containsKey(object.toVector2())==true&&override==false) {
-			//Main.instance.launcher.getLogger().error("Tried to register LevelObject (" + object.getClass().getSimpleName() + "), one already existent and overriding was set to false.");
+			//this.getMainInstance().launcher.getLogger().error("Tried to register LevelObject (" + object.getClass().getSimpleName() + "), one already existent and overriding was set to false.");
 			return false;
 		}
 		
 		this.objects.put(object.toVector2(), object);
-		
-		if(callUpdate==true) {
-			this.update();
-		}
-		
 		return true;
-	}
-	
-	public void update() {
-		Main.instance.launcher.onUpdate(this);
 	}
 	
 	public int getWidth() {
@@ -190,7 +183,6 @@ public class Level {
 	public String getName() {
 		return this.name;
 	}
-	
 	
 	public Player getPlayer() {
 		return this.player;
@@ -220,6 +212,28 @@ public class Level {
 			}
 		}
 		return null;
+	}
+	
+	public Entity getEntityAt(Vector2 vector) {
+		if(this.player.equals(vector)==true) {
+			return this.player;
+		} else {
+			for(Bot bot : this.bots) {
+				if(bot.equals(vector)==true) {
+					return bot;
+				}
+			}
+		}
+		return null;
+	}
+	
+	public Object getThingAt(Vector2 vector) {
+		//entites have more priority
+		Entity ent = this.getEntityAt(vector);
+		if(ent==null) {
+			return this.getLevelObjectAt(vector);
+		}
+		return ent;
 	}
 	
 	public boolean entityExists(int id) {

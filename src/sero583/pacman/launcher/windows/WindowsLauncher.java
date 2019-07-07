@@ -8,21 +8,18 @@ import sero583.pacman.launcher.BaseLauncher;
 import sero583.pacman.launcher.Logger;
 
 public class WindowsLauncher extends BaseLauncher implements KeyListener {
+	public static void main(String[] args) {
+		new Main(new WindowsLauncher()); //plot twist lul
+	}
+	
+	
 	private Main main;
 	
 	public WindowsLauncher() {
 		super(new WindowsLogger());
 		
 		this.main = new Main(this);
-		//Create JFrame here and mulitply with screen destiny..
-	}
-
-	public static void main(String[] args) {
-		new Main(new WindowsLauncher()); //plot twist lul
-	}
-	
-	public void onUpdate(Level level) {
-		//render here
+		this.createScreen();
 	}
 
 	@Override
@@ -41,10 +38,17 @@ public class WindowsLauncher extends BaseLauncher implements KeyListener {
 	}
 
 	@Override
-	public void keyReleased(KeyEvent e) {
+	public void keyReleased(KeyEvent e) {}
+
+	@Override
+	public void keyTyped(KeyEvent e) {}
+	
+	public void createScreen() {
+		//TODO: JFrame
 	}
 
 	@Override
-	public void keyTyped(KeyEvent e) {
+	public void startRenderer() {
+		//schedule draw task
 	}
 }

@@ -6,7 +6,7 @@ public class Wall extends Vector2 implements LevelObject {
 	//private int id;
 	private Color color;
 	
-	public Wall(Color color, int x, int y) {
+	public Wall(Color color, double x, double y) {
 		super(x, y);
 		//this.id = id;
 		this.color = color;

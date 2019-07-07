@@ -21,14 +21,4 @@ public class Player extends Entity {
 	public String getName() {
 		return this.name;
 	}
-
-	@Override
-	public boolean canCollide() {
-		return false;
-	}
-
-	@Override
-	public boolean harmfulCollision() {
-		return false;
-	}
 }

@@ -9,14 +9,10 @@ public class Main {
 	public BaseLauncher launcher;
 	
 	public Main(BaseLauncher launcher) {
-		if(Main.instance!=null) {
-			launcher.getLogger().error("Another instance is already running.");
-			return;
-		}
 		launcher.getLogger().info("Starting PacMan...");
 		Main.instance = this;
 		this.launcher = launcher;
-		this.level = new Level();
+		this.level = new Level(this);
 		launcher.getLogger().info("Started PacMan!");
 	}
 	
