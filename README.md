@@ -1,3 +1,6 @@
+#Update
+Discontinued as I figured many phsyics and that stuff are not equal to the ones of the real PacMan and no motivation was there to finish this.
+
 # PacMan
 This is lightweight PacMan clone written in Java. For now focusing on Windows development, there is more to come very soon! Feel free to contribute.
 # Why doing a PacMan clone, when there are dozens already around?
